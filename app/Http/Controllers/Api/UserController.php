@@ -4,19 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Kategori;
+use App\Models\user;
 use Validator;
-use Str;
 
-class KategoriController extends Controller
+class UserController extends Controller
 {
-   public function index()
+    public function index()
    {
-    $kategori = kategori::latest()->get();
+    $user = User::latest()->get();
     $res =[
         'success' => true,
-        'message' => "daftar kategori",
-        'data' => $kategori
+        'message' => "daftar user",
+        'data' => $user
     ];
     return response()->json($res, 200);
    }
@@ -24,7 +23,9 @@ class KategoriController extends Controller
    public function store( Request  $request)
   {
     $validator = Validator::make($request->all(), [
-      'nama_kategori' => 'required|unique:kategoris',
+      'name' => 'required',
+      'email' => 'required|unique:users',
+      'password' => 'required|min:8',
     ]);
 
     if($validator->fails()) {
@@ -36,14 +37,15 @@ class KategoriController extends Controller
     }
 
     try {
-        $kategori = new kategori();
-        $kategori->nama_kategori = $request->nama_kategori;
-        $kategori->slug = Str::slug($request->nama_kategori);
-        $kategori->save();
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->save();
         return response()->json([
             'success' => true,
             'message' => 'data berhasil dibuat',
-            'errors' => $kategori,
+            'errors' => $user,
         ], 201);
     }catch(\Exception $e) {
         return response()->json([
@@ -57,11 +59,11 @@ class KategoriController extends Controller
   public function show($id)
   {
     try{
-        $kategori = Kategori::findOrFail($id);
+        $user = User::findOrFail($id);
         return response()->json([
             'success' => true,
-            'message' => 'detail kategori',
-            'data' => $kategori,
+            'message' => 'detail user',
+            'data' => $user,
         ], 200);
     } catch(\Exception $e) {
         return response()->json([
@@ -75,7 +77,8 @@ class KategoriController extends Controller
   public function update( Request  $request,$id)
   {
     $validator = Validator::make($request->all(), [
-      'nama_kategori' => 'required',
+      'name' => 'required',
+      'email' => 'required|unique:users',
     ]);
 
     if($validator->fails()) {
@@ -87,14 +90,14 @@ class KategoriController extends Controller
     }
 
     try {
-        $kategori = kategori::findOrFail($id);
-        $kategori->nama_kategori = $request->nama_kategori;
-        $kategori->slug = Str::slug($request->nama_kategori);
-        $kategori->save();
+        $user = User::findOrFail($id);
+        $user->name = $request->name;
+        $user->email= $request->email;
+        $user->save();
         return response()->json([
             'success' => true,
             'message' => 'data berhasil diperbaharui',
-            'errors' => $kategori,
+            'errors' => $user,
         ], 200);
     }catch(\Exception $e) {
         return response()->json([
@@ -108,11 +111,11 @@ class KategoriController extends Controller
   public function destroy($id)
   {
     try{
-        $kategori = Kategori::findOrFail($id);
-        $kategori->delete();
+        $user = User::findOrFail($id);
+        $user->delete();
         return response()->json([
             'success' => true,
-            'message' =>'Data' . $kategori-> nama_kategori . 'berhasil dihapus',
+            'message' =>'Data ' . $user-> nama_user . ' berhasil dihapus',
         ], 200);
     } catch(\Exception $e) {
         return response()->json([
@@ -122,5 +125,4 @@ class KategoriController extends Controller
         ], 404);
     }
   }
-
 }
