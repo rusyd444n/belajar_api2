@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\user;
+use Illuminate\Notification\HasApiToken;
 use Validator;
 
 class UserController extends Controller
@@ -93,6 +94,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->name = $request->name;
         $user->email= $request->email;
+        $user->password = bcrypt($request->password);
         $user->save();
         return response()->json([
             'success' => true,
